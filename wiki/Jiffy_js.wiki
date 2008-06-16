@@ -1,5 +1,3 @@
-= jiffy.js =
-
 The jiffy.js file is the core of measuring marks within the page on the client and sending them back to the server for logging. 
 
 
