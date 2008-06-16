@@ -22,3 +22,30 @@ example:
 }}}
 
 ----
+
+= Jiffy Options =
+In the Jiffy.js file you will see a options section. These are used to turn on and off the few options we have today. 
+You may provide overrides for these default options by providing them in a globally scoped hash named JiffyOptions.
+
+*USE_JIFFY* - record and log measures
+
+*ISBULKLOAD* - use the bulk load function which gathers all marks and measures and sends them as one request on the load event
+
+*BROWSER_EVENTS* - built in browser events that will be measured. i.e. load, unload, DOMReady
+
+*SOFT_ERRORS* - Allows us to view try statement errors by displaying them in an alert.
+
+
+example:
+{{{
+<script type="text/javascript">
+  JiffyOptions = {
+    USE_JIFFY:true,
+    ISBULKLOAD: true,
+    BROWSER_EVENTS: {"unload":window,"load":window},
+    SOFT_ERRORS: false
+  };
+</script>
+}}}
+
+----
