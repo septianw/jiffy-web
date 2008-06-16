@@ -31,7 +31,7 @@ You may provide overrides for these default options by providing them in a globa
 
 *ISBULKLOAD* - use the bulk load function which gathers all marks and measures and sends them as one request on the load event
 
-*BROWSER_EVENTS* - built in browser events that will be measured. i.e. load, unload, DOMReady
+*BROWSER_EVENTS* - built in browser events that will be measured automatically if listed in this hash. i.e. load, unload, DOMReady
 
 *SOFT_ERRORS* - Allows us to view try statement errors by displaying them in an alert.
 
@@ -49,3 +49,21 @@ example:
 }}}
 
 ----
+
+= Mark & Measure =
+Jiffy exposes it ability to generate measurements on the client through a mechanism we call mark & measure. Marks are moments in a page tagged by a time and measures will measure back to a mark then log that to the server either by doing them as they happen or by the bulk load which gathers all measures and sends them at once on page load. 
+
+example:
+}}}
+<script type="text/javascript">
+  Jiffy.mark("rsiStart");
+</script>
+
+<script type="text/javascript" src="http://js.revsci.net/gateway/gw.js?csid=A06546"></script>
+
+<script type="text/javascript">
+  Jiffy.measure("rsiDone", "rsiStart");
+</script>
+}}}
+
+The example above will create a mark named rsiStart and when the script below it has completed its execution the call to measure includes a reference to the mark we want to measure back to. 
