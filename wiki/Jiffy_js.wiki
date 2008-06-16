@@ -1,0 +1,20 @@
+= jiffy.js =
+
+The jiffy.js file is the core of measuring marks within the page on the client and sending them back to the server for logging. 
+
+
+= *JiffyParams* =
+JiffyParams is a globally scoped hash that needs to be declared before the jiffy.js file is included. This hash has three main settings required for Jiffy to function.
+
+jsStart: This is the start time we will measure all marks back to. It is important to make sure that this is at the top most place in your page
+uid: This is a unique ID that will be used in reporting to link all measures together as a single page.
+pname: The name of the page you are measuring. This is used mostly for reporting. 
+
+example:
+<script type="text/javascript">
+  var JiffyParams = {
+     jsStart: (new Date()).getTime(),
+     uid: <xsl:value-of select="/page/settings/random" />,
+     pname: '<xsl:value-of select="$pagename" />'
+  }
+</script>
