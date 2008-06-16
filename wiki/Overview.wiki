@@ -4,4 +4,4 @@ Jiffy-web is a fine-grained and flexible website performance tracking and analys
 
 Currently we are using an Apache proxy to take all requests to /rx and store them in standard Apache logs. We then have an ingestion script written in Perl that will take these logs parse them and insert to the DB. We are currently using Oracle but we do have a DDL for MySQL. 
 
-http://code.google.com/p/jiffy-web/Jiffy.png
+http://code.google.com/p/jiffy-web/wiki/Jiffy.png
