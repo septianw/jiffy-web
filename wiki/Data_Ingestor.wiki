@@ -1,2 +1,2 @@
 = Introduction =
-Place holder for data ingestor script
+The ingestion script is run as a CRON job to ingest the Apache logs into the data store. The script is set up to accept and parse both the on demand measures and the batch measures. The format for these two types of log entries look like the following:
