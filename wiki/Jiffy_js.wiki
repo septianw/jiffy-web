@@ -1,7 +1,7 @@
 The jiffy.js file is the core of measuring marks within the page on the client and sending them back to the server for logging. 
 
 
-= JiffyParams =
+= Jiffy Params =
 JiffyParams is a globally scoped hash that needs to be declared before the jiffy.js file is included. This hash has three main settings required for Jiffy to function.
 
 *jsStart*: This is the start time we will measure all marks back to. It is important to make sure that this is at the top most place in your page.
