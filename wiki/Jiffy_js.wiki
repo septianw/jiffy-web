@@ -54,7 +54,7 @@ example:
 Jiffy exposes it ability to generate measurements on the client through a mechanism we call mark & measure. Marks are moments in a page tagged by a time and measures will measure back to a mark then log that to the server either by doing them as they happen or by the bulk load which gathers all measures and sends them at once on page load. 
 
 example:
-}}}
+{{{
 <script type="text/javascript">
   Jiffy.mark("rsiStart");
 </script>
