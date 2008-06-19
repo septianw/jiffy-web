@@ -5,7 +5,7 @@
 # Grab jiffy log data from jiffy.log and insert into database, tossing
 # malformed lines to stdout.
 #								
-# Copyright 2008 Whitepages Inc.
+# Copyright 2008 Whitepages.com, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
