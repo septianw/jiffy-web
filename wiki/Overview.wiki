@@ -1,7 +1,24 @@
 = Jiffy Overview =
 
-Jiffy-web is a fine-grained and flexible website performance tracking and analysis suite. It includes mechanisms to measure execution time of certain browser events as well as elements designated by the web author. This ability allows for real world client times be then be sent back to a server to log each one of these measures. It is then possible to generate reports based on the data gathered from the clients viewing your page. 
+Jiffy is an end-to-end real-world web page instrumentation and measurement suite.
 
-Currently we are using an Apache proxy to take all requests to /rx and store them in standard Apache logs. We then have an ingestion script written in Perl that will take these logs parse them and insert to the DB. We are currently using Oracle but we do have a DDL for MySQL. 
+Jiffy allows developers to 
+
+  * measure individual pieces of page rendering (script load, AJAX execution, page load, etc.) on every client
+  * report those measurements and other metadata to a web server
+  * aggregate web server logs into a database
+  * generate reports 
+
+Additionally, using Bill Scott's [http://billwscott.com/jiffyext/ Jiffy extension for Firebug], developers can see and test Jiffy-based measurements.
+
+Currently we provide the following components:
+
+  * Jiffy.js, the Javascript library used for generating measurements; it's tested across IE6 & 7, FF2 & 3, and Safari 3.
+  * Apache proxy (httpd.conf) configuration for logging Jiffy posts
+  * An ingestor (written in Perl) which runs on the Apache server and posts logs to a database through DBI
+  * Working DDLs for Oracle & MySQL
+  * Reporting rollup code for Oracle (MySQL to come)
+  * A reporting UI using the Yahoo! User Interface library
+
 
 http://jiffy-web.googlecode.com/svn/Jiffy.png
