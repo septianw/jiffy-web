@@ -1,16 +1,42 @@
-The jiffy.js file is the core of measuring marks within the page on the client and sending them back to the server for logging. 
+Jiffy.js file is the core Javascript library for instrumenting your pages. 
+
+----
+
+= Mark & Measure =
+
+Mark and Measure are the fundamental concepts around building page measurements.
+
+  * *Mark* names a moment in time. (Time is current client time as captured by Javascript.)
+  * *Measure* returns the elapsed time between now and the previous named mark.
+
+Each measure is then combined with some metadata and then either posted immediately back to the web server or held for a bulk post at the end of measure processing.
+
+Here's an example timing the loading and execution of a Javascript call:
+
+{{{
+<script type="text/javascript">
+  Jiffy.mark("slowThirdPartyStart");
+</script>
+
+<script type="text/javascript" src="http://www.slowsite.com/slow.js"></script>
+
+<script type="text/javascript">
+  Jiffy.measure("slowThirdPartyDone", "slowThirdPartyStart");
+</script>
+}}}
 
 
-= Jiffy Params =
-JiffyParams is a globally scoped hash that needs to be declared before the jiffy.js file is included. This hash has three main settings required for Jiffy to function.
+= Jiffy Parameters =
+JiffyParams is a globally scoped hash. Including these parameters are optional.
 
-*jsStart*: This is the start time we will measure all marks back to. It is important to make sure that this is at the top most place in your page.
+  * *jsStart*: This is the start time, which we report in each measurement, and is used for default browser measurements. Because this is when Jiffy starts timing, you want this to be as far at the top of the page as possible. If Jiffy.js is loaded at the top of the page and you don't need to override any of the parameters below, you don't need this call; if you aren't loading Jiffy.js at the top of the page, you want to include this at the top. If you do set jsStart through this hash, the hash must be called *before* Jiffy.js is loaded.
 
-*uid*: This is a unique ID that will be used in reporting to link all measures together as a single page.
+  * *uid*: This is a unique ID that will be used in reporting to link all measures together as a single page. If you don't provide a uid, we'll create a random one using Javascript's Math.random(). (For non-crypto uses and with little concern about occasional overlap, Math.random() is fine, but overall Math.random()'s entropy is questionable: [http://objectmix.com/javascript/120715-math-random-algorithm.html you can read more here].)
 
-*pname*: The name of the page you are measuring. This is used mostly for reporting. 
+  * *pname*: The name of the page you are measuring. This is used for reporting. If you don't provide a pname, Jiffy will pass the current window.location (generally the URL unless you override). 
 
 example:
+
 {{{
 <script type="text/javascript">
   var JiffyParams = {
@@ -24,16 +50,16 @@ example:
 ----
 
 = Jiffy Options =
-In the Jiffy.js file you will see a options section. These are used to turn on and off the few options we have today. 
-You may provide overrides for these default options by providing them in a globally scoped hash named JiffyOptions.
 
-*USE_JIFFY* - record and log measures
+Jiffy.js sets some options, overridable in your own content with a globally scoped hash named JiffyOptions. These are usually set sitewide.
 
-*ISBULKLOAD* - use the bulk load function which gathers all marks and measures and sends them as one request on the load event
+  * *USE_JIFFY* - record and log measures
 
-*BROWSER_EVENTS* - built in browser events that will be measured automatically if listed in this hash. i.e. load, unload, DOMReady
+  * *ISBULKLOAD* - use the bulk load function which gathers all marks and measures and sends them as one request on the OnLoad event. 
 
-*SOFT_ERRORS* - Allows us to view try statement errors by displaying them in an alert.
+  * *BROWSER_EVENTS* - built in browser events that will be measured automatically if listed in this hash. Examples include load, unload, & DOMReady. Note that there is some interaction between these two options: since ISBULKLOAD posts the measures on the OnLoad event and unload happens after load, the unload event (if included) will always post as a separate measure. 
+
+  * *SOFT_ERRORS* - Allows you to view try statement errors by displaying them in an alert.
 
 
 example:
@@ -47,23 +73,3 @@ example:
   };
 </script>
 }}}
-
-----
-
-= Mark & Measure =
-Jiffy exposes it ability to generate measurements on the client through a mechanism we call mark & measure. Marks are moments in a page tagged by a time and measures will measure back to a mark then log that to the server either by doing them as they happen or by the bulk load which gathers all measures and sends them at once on page load. 
-
-example:
-{{{
-<script type="text/javascript">
-  Jiffy.mark("rsiStart");
-</script>
-
-<script type="text/javascript" src="http://js.revsci.net/gateway/gw.js?csid=A06546"></script>
-
-<script type="text/javascript">
-  Jiffy.measure("rsiDone", "rsiStart");
-</script>
-}}}
-
-The example above will create a mark named rsiStart and when the script below it has completed its execution the call to measure includes a reference to the mark we want to measure back to. 
