@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Page Performance Reporting</title>
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/assets/skins/sam/skin.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/menu/assets/skins/sam/menu.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/assets/skins/sam/button.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/assets/skins/sam/calendar.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/assets/skins/sam/layout.css" />
+    <style type="text/css">
+        body { font-family:arial,helvetica,sans-serif }
+        #center-content, #left-content { visibility:hidden }
+        .yui-layout-hd h2 { margin-top:8px }
+        .yui-skin-sam .yui-button { margin-left:0px }
+        #left-content { margin:2px }
+        #left-content input { border:solid 1px #808080 }
+        #left-content h4 { margin-bottom:0px; font-size:90% }
+        #intervalsContainer, #btnGetReportContainer { font-size:80% }
+        #eventSelectContainer { margin-top:0.5em; font-size:70% }
+        #eventSelectContainer button { margin:0 }
+        #calStartContainer, #calEndContainer { display:none; position:absolute; font-size:70% }
+        #calStartContainer { z-index:2 }
+        #calEndContainer { z-index:4 }
+        #txtStartDate, #txtEndDate { width:140px }
+        #chartContainer { height:400px }
+    </style>
+</head>
+<body class="yui-skin-sam">
+    <div id="top1"></div>
+    <div id="left1">
+        <div id="left-content">
+            <h4>Report Start Date</h4>
+            <input id="txtStartDate" type="text" name="start" value="" />
+            <div id="calStartContainer"></div>
+            <h4>Report End Date</h4>
+            <input id="txtEndDate" type="text" name="end" value="" />
+            <div id="calEndContainer"></div>
+            <br />
+            <h4>Report Interval</h4>
+            <div id="intervalsContainer"> </div>
+            <input type="hidden" name="int" id="txtInterval" value="1h" />
+            <br />
+            <br />
+            <div id="btnGetReportContainer"></div>
+        </div>
+    </div>
+    <div id="center1">
+        <div id="center-content">
+            <h2 id="pageTitle"></h2>
+            <div id="chartContainer"></div>
+            <div id="eventSelectContainer"></div>
+        </div>
+    </div>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/utilities/utilities.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/container/container_core-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/menu/menu-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/button/button-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/calendar/calendar-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/datasource/datasource-beta-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/json/json-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/charts/charts-experimental-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.5.2/build/layout/layout-beta-min.js"></script>
+<script type="text/javascript" src="report.js"></script>
+</body>
+</html>
