@@ -144,16 +144,17 @@ sub main {
         $DBH = DBI->connect($DSN, $USER, $PASS, { AutoCommit => 0, PrintError => 0, RaiseError => 0, })
                || die "Can't connect: $DBH::err";
     
-        # set lockfile
-	my $lockfile_age_secs = -M $LOCKFILE * (24*60*60);
-        unless (system("/usr/bin/lockfile -r 0 ${LOCKFILE}")) {
-	    if ($lockfile_age_secs > $LONG_JOB_SECS) {
-		die "Unable to obtain lock after $LONG_JOB_SECS seconds";
-	    }
-	    else {
-		exit(0);
-	    }
-	}
+		# set lockfile, 
+		my $lockfile_age_secs = -M $LOCKFILE * (24*60*60);
+		if (0 != system("/usr/bin/lockfile -r 0 ${LOCKFILE}")) { # /usr/bin/lockfile returns 0 on success
+			eval { $DBH->disconnect(); };
+			if ($lockfile_age_secs > $LONG_JOB_SECS) {
+				die "Unable to obtain lock after $LONG_JOB_SECS seconds";
+			}
+			else {
+				exit(0);
+			}
+		}
     }
     
     # execution block
