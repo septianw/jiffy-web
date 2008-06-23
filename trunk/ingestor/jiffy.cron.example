@@ -1,0 +1,3 @@
+# jiffy web cron entry.  Sometimes located in /etc/cron.d
+* * * * * apache /home/jiffy/bin/performance_log_inserter.pl -l /var/www/logs/jiffy.log -O
+ -c /opt/oracle/product/current -H reporting -U jiffy_loader
