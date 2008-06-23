@@ -2,7 +2,7 @@
 
 In the database folder there are two setup scripts (`gen_jiffy_base_schema_oracle.sh` and `gen_jiffy_dw_schema_oracle.sh`) and an example config file (`jiffy_oracle.cfg`) which drives them.
 
-To setup a jiffy database, you will need administrator access to an [http://www.oracle.com/technology/products/database/xe/index.html Oracle XE] (or better) database. Edit the sample config file supplying appropriate values for each keyword.
+To setup a jiffy database, you will need administrator access to an [http://www.oracle.com/technology/products/database/xe/index.html Oracle XE] (or higher) database. Edit the sample config file supplying appropriate values for each keyword.
 
 The config keywords should be self-explanatory.  EMAIL_FROM and EMAIL_TO control the sending of the schema creation report via email for the base schema creation.
 
