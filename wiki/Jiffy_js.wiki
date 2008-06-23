@@ -1,4 +1,4 @@
-Jiffy.js file is the core Javascript library for instrumenting your pages. 
+ Jiffy.js file is the core Javascript library for instrumenting your pages. 
 
 ----
 
@@ -112,7 +112,7 @@ In each case,
   * *uid* - Unique session id for the page, either automatically created or overridden as above.
   * *st* - start time of the page, set by the jsStart() call.
   * *pn* - page name, either window.location() or overridden as above.
-  * *ets* - Elapsed times serialized. Each element in this object is the name of the measure and its elapsed time, e.g. slowJS(measure name):12(elapsed time)
+  * *ets* - Elapsed times serialized. Each element in this object is the name of the measure and its elapsed time, e.g. {{{slowJS(measure name):12(elapsed time)}}}
 
 
 
