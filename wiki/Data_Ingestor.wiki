@@ -1,5 +1,5 @@
 = Introduction =
-The ingestor is written in Perl and currently requires one non-core module, DBI (DBI is licensed differently then Jiffy).  The ingestor was designed to be lightweight, only relying on functionality available in the core distribution, and is capable of processing several thousand lines a second without using a lot of CPU on your collection hosts.
+The ingestor is written in Perl and currently requires one non-core module, DBI (DBI is licensed differently then Jiffy).  The ingestor was designed to be lightweight, only relying on functionality available in the core distribution, and is capable of processing several thousand lines a second without using a lot of CPU on your web servers.
 
 The script can be run as a CRON job to ingest the Apache logs into the data store. It is setup to accept and parse both the on demand measures and the bulk measures. The format for these two types of log entries look like the following:
 
