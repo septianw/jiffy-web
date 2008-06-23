@@ -174,50 +174,49 @@ begin
              )
     loop
 
-      crstr := 'CREATE TABLE MEASUREMENT_' || rec.datestr ||
-               '( ' ||
-               ' UUID              VARCHAR2(32) NOT NULL,' ||
-               ' MEASUREMENT_CODE  VARCHAR2(20) NOT NULL,' ||
-               ' SEQ               NUMBER NOT NULL,' ||
-               ' PAGE_NAME         VARCHAR2(255),' ||
-               ' ELAPSED_TIME      NUMBER(7),' ||
-               ' CLIENT_IP         CHAR(15),' ||
-               ' USER_AGENT        VARCHAR2(255),' ||
-               ' BROWSER           VARCHAR2(255),' ||
-               ' OS                VARCHAR2(255),' ||
-               ' SERVER            VARCHAR2(255),' ||
-               ' SERVER_TIME       TIMESTAMP,' ||
-               ' USER_CAT1         VARCHAR2(255),' ||
-               ' USER_CAT2         VARCHAR2(255),' ||
-               ' CONSTRAINT MEASUREMENT_' || rec.datestr || '_PK PRIMARY KEY' ||
-               ' ( UUID, MEASUREMENT_CODE ) USING INDEX TABLESPACE ${INDEX_TABLESPACE}' ||
-               ')';
-    execute immediate crstr;
+		crstr := 'CREATE TABLE MEASUREMENT_' || rec.datestr ||
+			   '( ' ||
+			   ' UUID              VARCHAR2(32) NOT NULL,' ||
+			   ' MEASUREMENT_CODE  VARCHAR2(20) NOT NULL,' ||
+			   ' SEQ               NUMBER NOT NULL,' ||
+			   ' PAGE_NAME         VARCHAR2(255),' ||
+			   ' ELAPSED_TIME      NUMBER(7),' ||
+			   ' CLIENT_IP         CHAR(15),' ||
+			   ' USER_AGENT        VARCHAR2(255),' ||
+			   ' BROWSER           VARCHAR2(255),' ||
+			   ' OS                VARCHAR2(255),' ||
+			   ' SERVER            VARCHAR2(255),' ||
+			   ' SERVER_TIME       TIMESTAMP,' ||
+			   ' USER_CAT1         VARCHAR2(255),' ||
+			   ' USER_CAT2         VARCHAR2(255),' ||
+			   ' CONSTRAINT MEASUREMENT_' || rec.datestr || '_PK PRIMARY KEY' ||
+			   ' ( UUID, MEASUREMENT_CODE ) USING INDEX TABLESPACE ${INDEX_TABLESPACE}' ||
+			   ')';
+	    execute immediate crstr;
 
-    crstr :=  'CREATE OR REPLACE TRIGGER m_seq_' || rec.datestr ||
-              ' BEFORE INSERT ON measurement_' || rec.datestr ||
-              ' FOR EACH ROW' ||
-              ' BEGIN' ||
-              '     SELECT measurement_seq.nextval INTO :new.seq FROM DUAL;' ||
-              ' END';
-    execute immediate crstr;
-            
-    crstr := 'CREATE INDEX IDX_MEA_' || rec.datestr || '_STIME_PNAME' ||
-             ' ON MEASUREMENT_' || rec.datestr || '(SERVER_TIME, PAGE_NAME)';
-    execute immediate crstr;
+	    crstr :=  'CREATE OR REPLACE TRIGGER m_seq_' || rec.datestr ||
+	              ' BEFORE INSERT ON measurement_' || rec.datestr ||
+	              ' FOR EACH ROW' ||
+	              ' BEGIN' ||
+	              '     SELECT measurement_seq.nextval INTO :new.seq FROM DUAL;' ||
+	              ' END';
+	    execute immediate crstr;
+	            
+	    crstr := 'CREATE INDEX IDX_MEA_' || rec.datestr || '_STIME_PNAME' ||
+	             ' ON MEASUREMENT_' || rec.datestr || '(SERVER_TIME, PAGE_NAME)';
+	    execute immediate crstr;
 
-    crstr := 'CREATE UNIQUE INDEX IDX_MEA_' || rec.datestr || '_SEQ' ||
-             ' ON MEASUREMENT_' || rec.datestr || '(SEQ)';
-    execute immediate crstr;
+	    crstr := 'CREATE UNIQUE INDEX IDX_MEA_' || rec.datestr || '_SEQ' ||
+	             ' ON MEASUREMENT_' || rec.datestr || '(SEQ)';
+	    execute immediate crstr;
 
-    crstr := 'GRANT SELECT, UPDATE, INSERT ON MEASUREMENT_' || rec.datestr || ' TO ${JIFFY_LOADER_USERNAME}';
-    execute immediate crstr;
+	    crstr := 'GRANT SELECT, UPDATE, INSERT ON MEASUREMENT_' || rec.datestr || ' TO ${JIFFY_LOADER_USERNAME}';
+	    execute immediate crstr;
 
-    crstr := 'GRANT SELECT ON MEASUREMENT_' || rec.datestr || ' TO ${JIFFY_READER_USERNAME}';
-    execute immediate crstr;
+	    crstr := 'GRANT SELECT ON MEASUREMENT_' || rec.datestr || ' TO ${JIFFY_READER_USERNAME}';
+	    execute immediate crstr;
 
-    l_message := l_message ||  'MEASUREMENT_' || rec.datestr || l_crlf;
-
+	    l_message := l_message ||  'MEASUREMENT_' || rec.datestr || l_crlf;
 
     end loop;
 
@@ -240,11 +239,15 @@ begin
     select to_char(sysdate,'YYYY') into l_year from dual;
 
     crstr := '';
-    for trec in ( select decode(rownum,1,'create or replace VIEW MEASUREMENT_VIEW as select * from ' || table_name,
-                                         '  union all select * from ' || table_name) sqlst
-                  from user_tables where table_name like 'MEASUREMENT_' || l_year || '%')
+    for trec in (
+		select (
+			decode(rownum,1,
+				'create or replace viewSs MEASUREMENT_VIEW as',
+	            '  union all')
+			|| ' select * from ' || table_name) sqlst
+        from user_tables where table_name like 'MEASUREMENT_2%')
     loop
-      crstr := crstr || trec.sqlst;
+		crstr := crstr || trec.sqlst;
     end loop;
     execute immediate crstr;
 
