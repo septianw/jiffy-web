@@ -12,16 +12,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * */ 
+ * 
+ */ 
 
-var Jiffy = function() {
-	return {
-		Config: {
-			reportEvents: {
-				load: true,
-				rsiDone: false,
-				veDone: false
-			}			
-		}		
-	};
+var Jiffy = {
+	Config: {
+		Events: {
+			load: {
+				inSeries: true,
+				lineColor: 0x0000cc,
+				buttonText: 'Page Load'
+			},
+			rsiDone: {
+				inSeries: false,
+				lineColor: 0x00cc00,
+				buttonText: 'RSI Load'
+			},
+			veDone: {
+				inSeries: false,
+				lineColor: 0xcc0000,
+				buttonText: 'VE Load'
+			}
+		}
+	}		
 };
