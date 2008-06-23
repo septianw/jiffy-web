@@ -1,5 +1,5 @@
 = Introduction =
-The ingestion script is written in Perl and currently requires one non-core module, DBI (DBI is licensed differently then Jiffy).
+The ingestion script is written in Perl and currently requires one non-core module, DBI (DBI is licensed differently then Jiffy).  It was designed to be lightweight, only relying on functionality available in the core distribution, and is capable of processing several thousand lines a second without using a lot of CPU on your collection hosts.
 
 The script can be run as a CRON job to ingest the Apache logs into the data store. It is setup to accept and parse both the on demand measures and the batch measures. The format for these two types of log entries look like the following:
 
@@ -18,7 +18,7 @@ usage: ./performance_log_inserter.pl [-hVD] -l <file> -m <value> -W <value> -O|-
  -D		: debug mode (no database interaction)
  -l <file>	: file containing jiffy logs
  -m <value>     : maximum number of lines to process this time (default 100000)
- -O|-M		: use Oracle | MySQL
+ -O|-M		: use Oracle | MySQL (COMING SOON)
  -c <path>	: path to client (ie ORACLE_HOME)
  -A <file>	: file containing database auth (COMING SOON)
  -H		: database host (or tnsname if -O)
