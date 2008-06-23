@@ -1,4 +1,4 @@
-A !JavaScript file is used to hold the event configuration and determine which events re reported, their settings and layout attributes.
+A !JavaScript file holds the event configuration to determine which events are reported, their settings, and layout attributes.
 
 The configuration is in the form of a JSON object with the following three attributes:
 
@@ -6,7 +6,7 @@ The configuration is in the form of a JSON object with the following three attri
   # buttonText - the text used on the checkbox button
   # inSeries - a boolean value indicating that the data should be shown on the initial page load
 
-If the event shows in the configuration it is available to the chart whther or not it's inSeries value is true or false
+If the event shows in the configuration it is available to the chart whether or not its inSeries value is true or false
 
 Example config:
 
