@@ -4,12 +4,12 @@
 
 
     // Oracle Configuration
-    define( 'DBTYPE', 'oci');
-    define( 'DBHOST', 'dbqa1.qa.whitepages.com');
-    define( 'DBNAME', 'repdwqa');
-    define( 'DBUSER', 'jiffy_reader');
-    define( 'DBPASS', 'jre_qa');
-    define( 'DBSCHEMA','jiffy.');
+    #define( 'DBTYPE', 'oci');
+    #define( 'DBHOST',  '<!--HOSTNAME-->');
+    #define( 'DBNAME',  '<!--DBNAME-->');
+    #define( 'DBUSER',  '<!--USERNAME-->');
+    #define( 'DBPASS',  '<!--PASSWORD-->');
+    #define( 'DBSCHEMA','<!--SCHEMANAME-->');
 
     // MySQL configuration
 	#define( 'DBTYPE',  'mysql');
