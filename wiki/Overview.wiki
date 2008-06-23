@@ -16,9 +16,11 @@ Currently we provide the following components:
   * Jiffy.js, the Javascript library used for generating measurements; it's tested across IE6 & 7, FF2 & 3, and Safari 3.
   * Apache proxy (httpd.conf) configuration for logging Jiffy posts
   * An ingestor (written in Perl) which runs on the Apache server and posts logs to a database through DBI
-  * Working DDLs for Oracle & MySQL
-  * Reporting rollup code for Oracle (MySQL to come)
+  * Working DDLs for Oracle XE and higher
+  * Reporting rollup code
   * A reporting UI using the Yahoo! User Interface library
+
+MySQL and PostgreSQL support is coming really soon now.
 
 
 http://jiffy-web.googlecode.com/svn/Jiffy.png
