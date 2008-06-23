@@ -106,3 +106,17 @@ ets is a serialized JSON object we are sending back to the server.
 Realtime will take measures as they are happening and send them as the calls to Jiffy.measure happen. This will allow you to get data as it is happening and in the case where someone may drop off before the page load event is executed you still get some data from the client. The format is the same except that ets will only contain one element. 
 
 yourURL.com/rx?uid=xxxxxxx,st=xxxxx,pn=somename,ets=slowJS:12
+
+*uid* - Uniqie session id for the page.
+
+*st* - start time of the page.
+
+*pn* - page name.
+
+*ets* - Elapsed times serialized. Each element in this object is the name of the measure and it's elapsed time.
+      
+      slowJS(measure name):12(elapsed time)
+
+
+
+        
