@@ -3,7 +3,7 @@
 Measuring performance is useless unless you have a way to monitor the data. Reporting on the data should meet three primary requirements:
 
   # Timely - The data should be available as quick as possible. If it takes to long to see what's going on, you will not be able to act responsibly.
-  # Multi-format - A report available from only one place cannot reach all those who need to know the data. The data nneds to be available in multiple formats through multiple communication processes.
+  # Multi-format - A report available from only one place cannot reach all those who need to know the data. The data needs to be available in multiple formats through multiple communication processes.
   # Plentiful - there should be enough data to draw conclusions and make plans accordingly  
 
 = Completed = 
@@ -13,7 +13,8 @@ The first stage, a single dynamic report with a chart. The report allows multipl
 = To Be Done =
 
   # Porting reporting to different databases, right now it only works against the Oracle database instance.
-  # Enable interval reporting with database rollups. Currently only a 1 hour interval is available. The plan is do be able and rollups by hour, half/hour, and two hour multiples, ruby, even daily rollups.
+  # Enable interval reporting with database rollups. Currently only a 1 hour interval is available. The plan is to support intervals varying from minutes to days and years.
+  # Support non-contiguous time selections spanning days (eg: peak hours, weekdays, etc.)
   # Additional server-side components.
 
 = Current Files = 
