@@ -1,11 +1,28 @@
+/*
+ * Copyright 2008 Whitepages.com, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ 
+var Page;
 (function() {
     var Dom = YAHOO.util.Dom,
         Event = YAHOO.util.Event;
 	// Location of Flash file used for charts
     YAHOO.widget.Chart.SWFURL = "http://yui.yahooapis.com/2.5.2/build/charts/assets/charts.swf";
 	// Primary Page Object
-    var Page = {
+    Page = {
         EventTypes: {
+			list: {},
 			handleSuccess: function(r) {
 				this.list = YAHOO.lang.JSON.parse(r.responseText);
 				return;
@@ -17,11 +34,7 @@
 				return (this.list[str]) ? this.list[str]['NAME'] : str;
 			},
 			// Array of values which determine which lines show on the graph
-			loadEvents: {
-				load: true,
-				rsiDone: false,
-				veDone: false
-			}
+			loadEvents: reduce(Jiffy.Config.Events,'inSeries')
         },
         StatData: {
             handleSuccess: function(r) {
@@ -72,26 +85,14 @@
 			// Build the series data based upon the contents of the event types load data
 			buildSeries: function() {
 				var series = [];
-				if ( Page.EventTypes.loadEvents.load ) {
-					series.push({
-						displayName: Page.EventTypes.getEventName('load'),
-						yField: 'load',
-						style: { color: 0x0000cc, size: 7 }
-					});
-				}
-				if ( Page.EventTypes.loadEvents.veDone ) {
-					series.push({
-						displayName: Page.EventTypes.getEventName('veDone'),
-						yField: 'veDone',
-                        style: { color: 0xcc0000, size: 7 }
-					});
-				}
-				if ( Page.EventTypes.loadEvents.rsiDone) {
-					series.push({
-                        displayName: Page.EventTypes.getEventName('rsiDone'),
-                        yField: 'rsiDone',
-                        style: { color: 0x00cc00, size: 7 }
-					});
+				for ( var key in Jiffy.Config.Events ) {
+					if ( Page.EventTypes.loadEvents[key] ) {
+						series.push({
+							displayName: Page.EventTypes.getEventName(key),
+							yField: key,
+							style: { color: Jiffy.Config.Events[key].lineColor, size: 7 }
+						});
+					}
 				}
 				return series;
 			},
@@ -167,6 +168,11 @@
 			][idx];
 		}
     };
+	function reduce(ary,key) {
+		var newArray = {};
+		for ( var el in ary ) { newArray[el] = ary[el][key]; }
+		return newArray;;
+	}
 	// Handles the selection of a date in the calendar popup, inserting the date into a text box
     function handleSelect(type,args,obj) {
         var dates=args[0];
@@ -237,43 +243,21 @@
 	// Buttons control which data is shown in the chart. By selecting a button an event triggers the updating
 	// of the EventTypes.loadData and then calling updateChart
     Event.onContentReady('eventSelectContainer', function() {
-		Page.btnEventLoad = new YAHOO.widget.Button({
-			type: "checkbox",
-			label: "Page Load",
-			id: "btnEventLoad",
-			name: "btnEventLoad",
-			value: "load",
-			container: "eventSelectContainer",
-			checked: true
-		});
-		Page.btnEventLoad.subscribe('checkedChange', function(args) {
-			Page.EventTypes.loadEvents['load'] = args.newValue;
-			Page.StatData.updateChart();
-		});
-        Page.btnEventRSI = new YAHOO.widget.Button({
-			type: "checkbox",
-			label: "RSI Load",
-			id: "btnEventRSI",
-			name: "btnEventRSI",
-			value: "rsiDone",
-			container: "eventSelectContainer"
-		});
-		Page.btnEventRSI.subscribe('checkedChange', function(args) {
-			Page.EventTypes.loadEvents['rsiDone'] = args.newValue;
-			Page.StatData.updateChart();
-		});
-        Page.btnEventVE = new YAHOO.widget.Button({
-			type: "checkbox",
-			label: "VE Load",
-			id: "btnEventVE",
-			name: "btnEventVE",
-			value: "veDone",
-			container: "eventSelectContainer"
-		});
-		Page.btnEventVE.subscribe('checkedChange', function(args) {
-			Page.EventTypes.loadEvents['veDone'] = args.newValue;
-			Page.StatData.updateChart();
-		});
+		for ( var key in Jiffy.Config.Events ) {
+			Page['btnEvent_'+key] = new YAHOO.widget.Button({
+				type: "checkbox",
+				label: Jiffy.Config.Events[key].buttonText,
+				id: "btnEvent_"+key,
+				name: "btnEvent_"+key,
+				value: key,
+				container: "eventSelectContainer",
+				checked: Jiffy.Config.Events[key].inSeries
+			});
+			Page['btnEvent_'+key].subscribe('checkedChange', function(args,obj) {
+				Page.EventTypes.loadEvents[obj.get('value')] = args.newValue;
+				Page.StatData.updateChart();
+			}, Page['btnEvent_'+key] );
+		}
     });
 	// This container does not do anything yet, eventually this will allow the grouping of data over preset
 	// periods of time.
@@ -287,10 +271,10 @@
             selectedMenuItem: 1,
             menu: [
                 { text: "1 Hour", value: '1h', onclick: { fn: updateIntervalInput } },
-                { text: "2 Hour", value: '2h', onclick: { fn: updateIntervalInput } },
-                { text: "4 Hour", value: '4h', onclick: { fn: updateIntervalInput } },
-                { text: "8 Hour", value: '8h', onclick: { fn: updateIntervalInput } },
-                { text: "1 Day",  value: '1d', onclick: { fn: updateIntervalInput } }
+                //{ text: "2 Hour", value: '2h', onclick: { fn: updateIntervalInput } },
+                //{ text: "4 Hour", value: '4h', onclick: { fn: updateIntervalInput } },
+                //{ text: "8 Hour", value: '8h', onclick: { fn: updateIntervalInput } },
+                //{ text: "1 Day",  value: '1d', onclick: { fn: updateIntervalInput } }
             ]
         });
     });
