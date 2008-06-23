@@ -1,3 +1,5 @@
+// Copyright 2008 Whitepages.com, Inc. See License.txt for more information.
+
 <?php
 
 // Requires PHP5 >= 5.2.0 or PECL json: >= 1.2.0
