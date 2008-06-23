@@ -1,18 +1,18 @@
 = Meaningful Reporting =
 
-Measuring performance is useless unless you have a way to monitor the data. Reporting on the data should meet three primary requirements:
+Measuring performance in near-time requires an efficient and extendible mechanism to be effective.  Reporting on the data should meet three primary requirements:
 
-  # Timely - The data should be available as quick as possible. If it takes to long to see what's going on, you will not be able to act responsibly.
-  # Multi-format - A report available from only one place cannot reach all those who need to know the data. The data needs to be available in multiple formats through multiple communication processes.
-  # Plentiful - there should be enough data to draw conclusions and make plans accordingly  
+  # Timely - The data should be available as quick as possible. If it takes too long to see what's going on, you will not be able to act responsibly.
+  # Multi-format - A report available from only one place cannot reach all those who need to know the data. The data needs to be available in multiple formats through multiple means.
+  # Plentiful - there should be enough data to draw definitive conclusions   
 
-= Completed = 
+= What we've completed = 
 
-The first stage, a single dynamic report with a chart. The report allows multiple dates to be requested and also allows the user to select one or multiple line graphs. A configuration file uses presets to define the events that are going to be shown on the graph.
+There's some good example code that generates single dynamic report with a chart. This report supports graphing at matrix of objects measurements over time. A configuration file uses presets to define the events that are going to be shown on the graph.
 
 = To Be Done =
 
-  # Porting reporting to different databases, right now it only works against the Oracle database instance.
+  # Porting reporting to different databases, right now it only works against an Oracle XE database instance.
   # Enable interval reporting with database rollups. Currently only a 1 hour interval is available. The plan is to support intervals varying from minutes to days and years.
   # Support non-contiguous time selections spanning days (eg: peak hours, weekdays, etc.)
   # Additional server-side components.
@@ -21,8 +21,8 @@ The first stage, a single dynamic report with a chart. The report allows multipl
 
 The current files in the reporting samples are:
 
-  # dbconn.inc.php - this file holds the settings used to connect to the database.
-  # report.php - server-side php script to pull data from the database.
-  # report.html - the web page.
-  # report.js - the javascript file used to pull data from the php scripts into the chart .
+  # dbconn.inc.php - database connect settings
+  # report.php - server-side php script to pull data from the database
+  # report.html - the web page
+  # report.js - graphing engine
   # [ReportEventsConfig config.js] - file to configure events 
