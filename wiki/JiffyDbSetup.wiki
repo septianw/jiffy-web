@@ -4,9 +4,9 @@ In the database folder there are two setup scripts (`gen_jiffy_base_schema_oracl
 
 To setup a jiffy database, you will need administrator access to an [http://www.oracle.com/technology/products/database/xe/index.html Oracle XE] (or higher) database. Edit the sample config file supplying appropriate values for each keyword.
 
-The config keywords should be self-explanatory.  EMAIL_FROM and EMAIL_TO control the sending of the schema creation report via email for the base schema creation.
+EMAIL_FROM and EMAIL_TO controls the sending of the schema creation reports via email for the base schema creation.
 
-The base logging tables are created by running `gen_jiffy_base_schema_oracle.sh` and then executing the created PL/SQL scripts via an administrative session with SQL*Plus. This will set-up the partitioning tables and views, declaring tables through the current year through January of the next year and establish a job to extend the partitioning for another year at each year roll over.
+The base logging tables are created by running `gen_jiffy_base_schema_oracle.sh` and then executing the created PL/SQL scripts via an administrative session with SQL*Plus. This will set-up the partitioning tables and views, declares tables through January of the next year, and establishes a job to extend the partitioning for another year at each year roll over.
 
 == Setting up data warehouse ==
 
