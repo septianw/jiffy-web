@@ -1,0 +1,27 @@
+= Meaningful Reporting =
+
+Measuring performance is useless unless you have a way to monitor the data. Reporting on the data should meet three primary requirements:
+
+  # Timely - The data should be available as quick as possible. If it takes to long to see what's going on, you will not be able to act responsibly.
+  # Multi-format - A report available from only one place cannot reach all those who need to know the data. The data nneds to be available in multiple formats through multiple communication processes.
+  # Plentiful - there should be enough data to draw conclusions and make plans accordingly  
+
+= Completed = 
+
+The first stage, a single dynamic report with a chart. The report allows multiple dates to be requested and also allows the user to select one or multiple line graphs. A configuration file uses presets to define the events that are going to be shown on the graph.
+
+= To Be Done =
+
+  # Porting reporting to different databases, right now it only works against the Oracle database instance.
+  # Enable interval reporting with database rollups. Currently only a 1 hour interval is available. The plan is do be able and rollups by hour, half/hour, and two hour multiples, ruby, even daily rollups.
+  #  Additional server-side components.
+
+= Current Files = 
+
+The current files in the reporting samples are:
+
+  # dbconn.inc.php - this file holds the settings used to connect to the database.
+  # report.php - server-side php script to pull data from the database.
+  # report.html - the web page.
+  # report.js - the javascript file used to pull data from the php scripts into the chart .
+  # [revconfig config.js] - file to configure events 
