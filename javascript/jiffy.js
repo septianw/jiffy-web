@@ -47,7 +47,20 @@ var Jiffy = function (){
 	uid:uid,
 	captured:{}
   };
-
+  	/* marks_measures
+	JSON Obj used for storing all captured marks and measures. This is mainly used by the 
+	Jiffy Firebug plugin but we use it for the bulk load operation. sample layout of the 
+	object looks like the following:
+	{
+     	"PageStart": { et: 2676, m: [
+			{et:2676, evt:"load", rt:1213159816044}
+      ]},
+      	"onLoad": { et: 74, m: [
+        	{et:7,  evt:"carouselcreated", rt:1213159818722},
+        	{et:67, evt:"finishedonLoad",  rt:1213159818729}
+      ]}
+	}
+	*/
   var marks_measures = [];
   
   return{
@@ -97,7 +110,6 @@ var Jiffy = function (){
 			addBulkLoad(_eventName, elapsedTime);
 		}
 		else{
-			//BWS: added ct:currTime
 			var curMeasures = Jiffy.utils.hashToJiffyList({id:_eventName,et:elapsedTime,rt:refStartTime});
 			Jiffy.Ajax.get('/rx',{uid:uid,st:pageTimer,pn:pname,ets:curMeasures});
 		}
