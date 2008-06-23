@@ -53,13 +53,12 @@ var Jiffy = function (){
   return{
   	// Creating a mark sets the startTime and lastTime to the curr time
 	mark : function(referenceID){
-		//BWS changed. Capture start time and last time in markers[]
 		var currTime = (new Date()).getTime();
 		markers[referenceID] = {startTime: currTime, lastTime: currTime}; 
 	},
 	
 	// Creating a measure will calculate 
-	// et (elasped time) as current time - markers[].currTime
+	// et (elapsed time) as current time - markers[].currTime
 	measure : function(eventName, referenceID){
 		if(Jiffy.options.USE_JIFFY == undefined || !Jiffy.options.USE_JIFFY){return};
 		/*Check to see if the eventName is a string which we use for wrapping
@@ -71,9 +70,6 @@ var Jiffy = function (){
 
 		var currTime = new Date().getTime();
 		
-		// BWS changed. The big change is each measure() records elapsedTime and the start
-		// time for this measure. This is important as it allows the firebug extension
-		// to know how to relatively place the measurements along a time axis.
 		var refStartTime;
 		var elapsedTime;
 		
@@ -109,7 +105,6 @@ var Jiffy = function (){
 	},
 
 	_bulkLoad: function(){
-	  //var bulkmeasures = Jiffy.utils.hashToJiffyList(Jiffy.getMeasures());
 	  var bulkmeasures = Jiffy.getMeasures();
 	  var bulkmeasuresCount = bulkmeasures.length;
 	  var measuresStr = "";
@@ -124,7 +119,6 @@ var Jiffy = function (){
 	  return marks_measures;
 	},
 	
-	// BWS added. A way to clear out the measures for the "clear" command in firebug extension.
 	clearMeasures: function() {
 		marks_measures = [];
 		markers = [];
@@ -164,11 +158,9 @@ Jiffy.utils = {
 	return document.getElementById(id);
   },
   onDOMReady: function(func) {
-	/** WP: For Mozilla/Opera 9+ */
 	if (document.addEventListener) {
 	  document.addEventListener("DOMContentLoaded",func,false);
 	}
-	/** WP: for IE */
 	/*@cc_on @*/
 	/*@if (@_win32)
 	document.write("<script id=__ie_onload defer src=javascript:void(0)><\/script>");
@@ -179,7 +171,6 @@ Jiffy.utils = {
 	  }
 	};
 	/*@end @*/
-	/** WP: for Safari */
 	if ( /WebKit/i.test(navigator.userAgent)) {
 	  var _timer = setInterval(function() {
 		if ( /loaded|complete/.test(document.readyState)) {
