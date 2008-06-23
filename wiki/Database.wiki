@@ -2,6 +2,8 @@
 
 Logically Jiffy uses two database schemas, one for collecting the detailed jiffy measurements, the other to roll up these measures into a data warehouse dimensioned cube for reporting and analysis. By default both schemas exist in the same database instance and namespace, but could easily be separated.
 
+See JiffyDbSetup for details on configuring the database.
+
 == Measurement details ==
 
 The principal data logged by jiffy is collected into MEASUREMENT table(s) containing tuple:
