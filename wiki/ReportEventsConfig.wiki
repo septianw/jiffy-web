@@ -1,4 +1,4 @@
-A JavaScript file is used to hold the event configuration and determine which events re reported, their settings and layout attributes.
+A !JavaScript file is used to hold the event configuration and determine which events re reported, their settings and layout attributes.
 
 The configuration is in the form of a JSON object with the following three attributes:
 
