@@ -1,3 +1,5 @@
+#  Copyright 2008 Whitepages.com, Inc. See License.txt for more information.
+
 #!/bin/sh
 
 usage() 
