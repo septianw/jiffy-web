@@ -25,6 +25,20 @@ Here's an example timing the loading and execution of a Javascript call:
 </script>
 }}}
 
+All measures are captured into a JSON object that can be accessed through the public method Jiffy.getMeasures() The return is a JSON object with a sample layout which looks like the following:
+
+{{{
+{
+  "PageStart": { et: 2676, m: [
+     {et:2676, evt:"load", rt:1213159816044}
+   ]},
+  "onLoad": { et: 74, m: [
+     {et:7,  evt:"carouselcreated", rt:1213159818722},
+     {et:67, evt:"finishedonLoad",  rt:1213159818729}
+   ]}
+}
+}}}
+
 
 = Jiffy Parameters =
 JiffyParams is a globally scoped hash. Including these parameters are optional.
