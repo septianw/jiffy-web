@@ -14,7 +14,7 @@ The first stage, a single dynamic report with a chart. The report allows multipl
 
   # Porting reporting to different databases, right now it only works against the Oracle database instance.
   # Enable interval reporting with database rollups. Currently only a 1 hour interval is available. The plan is do be able and rollups by hour, half/hour, and two hour multiples, ruby, even daily rollups.
-  #  Additional server-side components.
+  # Additional server-side components.
 
 = Current Files = 
 
@@ -24,4 +24,4 @@ The current files in the reporting samples are:
   # report.php - server-side php script to pull data from the database.
   # report.html - the web page.
   # report.js - the javascript file used to pull data from the php scripts into the chart .
-  # [revconfig config.js] - file to configure events 
+  # [ReportEventsConfig config.js] - file to configure events 
