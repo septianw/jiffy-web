@@ -1,14 +1,15 @@
-// Copyright 2008 Whitepages.com, Inc. See License.txt for more information.
-
 <?php
 
+// Copyright 2008 Whitepages.com, Inc. See License.txt for more information.
+
+
     // Oracle Configuration
-    define( 'DBTYPE',  'oci');
-    define( 'DBHOST',  '<!--HOSTNAME-->');
-    define( 'DBNAME',  '<!--SID-->');
-    define( 'DBUSER',  '<!--USERNAME-->');
-    define( 'DBPASS',  '<!--PASSWORD-->');
-    define( 'DBSCHEMA','<!--SCHEMANAME-->');
+    define( 'DBTYPE', 'oci');
+    define( 'DBHOST', 'dbqa1.qa.whitepages.com');
+    define( 'DBNAME', 'repdwqa');
+    define( 'DBUSER', 'jiffy_reader');
+    define( 'DBPASS', 'jre_qa');
+    define( 'DBSCHEMA','jiffy.');
 
     // MySQL configuration
 	#define( 'DBTYPE',  'mysql');
