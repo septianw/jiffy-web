@@ -1,10 +1,11 @@
 = Jiffy Database =
 
-Logically Jiffy uses two database schemas, one for collecting the detailed jiffy measurements, the other to roll up these measures into a data warehouse dimensioned cube for reporting and analysis.  By default both schemas exist in the same database instance and namespace, but could easily be separated.
+Logically Jiffy uses two database schemas, one for collecting the detailed jiffy measurements, the other to roll up these measures into a data warehouse dimensioned cube for reporting and analysis. By default both schemas exist in the same database instance and namespace, but could easily be separated.
 
 == Measurement details ==
 
-The principle data logged by jiffy is collected into MEASUREMENT table(s) containing tuple:
+The principal data logged by jiffy is collected into MEASUREMENT table(s) containing tuple:
+
   * UID
   * MEASUREMENT_CODE
   * SEQ
@@ -27,9 +28,11 @@ ELAPSED_TIME records the measured time in millseconds.
 
 BROWSER and OS are derived from USER_AGENT. These are presently stubbed and will always be NULL until we implement a mapping function.
 
-SERVER_TIME is the time stamp from the logging server; SERVER NAME is the hostname of the logging server.
+SERVER_TIME is the time stamp from the logging server; SERVER_NAME is the hostname of the logging server.
 
 PAGE_NAME is the logical name of the measured page which may be set explicitly by the client side instrumentation, or will be the full URI of the request if not supplied.
+
+USER_CAT1 and USER_CAT2 are optional columns for developers to add their custom fields. They're not yet supported by Jiffy.js - they're for future use only.
 
 == Partitioning details ==
 
