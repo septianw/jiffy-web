@@ -504,11 +504,13 @@ GRANT SELECT ON jiffy_sum_detail_fine TO ${JIFFY_READER_USERNAME};
 echo "
 CONNECT ${JIFFY_USERNAME}/${JIFFY_PASS}@${CONNECTSTRING};
 
+create or replace synonym MEASUREMENT_PART for JIFFY.MEASUREMENT_20080601;
+
 CREATE OR REPLACE PACKAGE roll_up
 IS
     FUNCTION next_minute(dt IN d_time.time_id%TYPE) RETURN d_time.time_id%TYPE;
     PROCEDURE extend_time_dim(beg_in IN d_time.time_id%TYPE, end_in IN d_time.time_id%TYPE);
-    PROCEDURE roll_up_partition(part_in IN VARCHAR2, beg_in IN NUMBER, end_in IN NUMBER)
+    PROCEDURE roll_up_partition(part_in IN VARCHAR2, beg_in IN NUMBER, end_in IN NUMBER);
     PROCEDURE roll_up_range(beg_in IN NUMBER, end_in IN NUMBER);
     PROCEDURE roll_up_new;
 END roll_up;
@@ -535,25 +537,33 @@ IS
     PROCEDURE extend_time_dim(beg_in IN d_time.time_id%TYPE, end_in IN d_time.time_id%TYPE)
     IS
         dt      d_time.time_id%TYPE;
+        min_dt  d_time.time_id%TYPE;
+        max_dt  d_time.time_id%TYPE;
         beg_dt  d_time.time_id%TYPE;
         end_dt  d_time.time_id%TYPE;
     BEGIN
         -- fix range bounds
-        select TRUNC(beg_in,'MI') into beg_dt from dual;
-        select TRUNC(end_in,'MI') into end_dt from dual;
-        select max(time_id)       into dt     from d_time;
-        if beg_dt is null then
-            if dt is null then
-                raise_application_error(-20000, 'null begin date for extend_time_dim');
-            else
-                beg_dt := next_minute(dt);  -- start at next minute after current high
-            end if;
-        end if;
-        if end_dt is null then
-            -- default will extend to end of next day
-            select trunc(beg_dt+1.99,'DD') into end_dt from dual;
-        end if;
-        
+        select max(time_id) into max_dt from d_time;
+		if max_dt is null then
+			-- init time dimension to cover this year
+			select trunc(sysdate,'YYYY') into beg_dt from dual;
+			select trunc(beg_dt+366,'YYYY') into end_dt from dual;
+		else
+			select min(time_id) into min_dt from d_time;
+	        select TRUNC(beg_in,'MI') into beg_dt from dual;
+	        select TRUNC(end_in,'MI') into end_dt from dual;
+			if beg_dt is null or (min_dt <= beg_dt and beg_dt <= max_dt) then
+				beg_dt := next_minute(max_dt); 
+			end if;
+			if beg_dt < min_dt then
+				end_dt := min_dt;	-- filling prior time range, bring forward to existing
+			end if;
+	        if end_dt is null then
+	            -- default will extend to end of next day
+	            select trunc(beg_dt+1.99,'DD') into end_dt from dual;
+	        end if;
+		end if;
+		
         -- loop, inserting d_time records for minute intervals
         dt := beg_dt;
         while dt < end_dt
@@ -561,29 +571,175 @@ IS
             insert into d_time(time_id) values (dt);
             dt := next_minute(dt);
         end loop;
-        commit;
     END extend_time_dim;
     
     PROCEDURE roll_up_partition(part_in IN VARCHAR2, beg_in IN NUMBER, end_in IN NUMBER)
     IS
+		tstr	VARCHAR2(2000);
+        max_dt  d_time.time_id%TYPE;
     BEGIN
-        dbms_output.put_line('part_in=' || to_char(part_in));
-    END roll_up_range;
+        --dbms_output.put_line('part_in=' || to_char(part_in));
+		-- bind synonym to this partition
+		tstr := 'create or replace synonym MEASUREMENT_PART for JIFFY.MEASUREMENT_' || part_in;
+		execute immediate tstr;
+		-- empty the facts stage 
+		execute immediate 'truncate table measurement_facts_stage';
+		-- roll up to stage
+		insert into measurement_facts_stage (
+			d_time_id
+		  , d_code
+		  , d_page
+		  , d_browser
+		  , d_os
+		  , d_cat1
+		  , d_cat2
+		  , et_count
+		  , et_sum
+		  , et_sum_squares
+		  , et_min
+		  , et_max
+		)
+			select
+				trunc(server_time,'MI') stime
+			  , measurement_code
+			  , page_name
+			  , browser
+			  , os
+			  , user_cat1
+			  , user_cat2
+			  , count(elapsed_time) et_count
+			  , sum(elapsed_time) et_sum
+			  , sum(elapsed_time * elapsed_time) et_sum_squares
+			  , min(elapsed_time) et_min
+			  , max(elapsed_time) et_max
+			from MEASUREMENT_PART o
+			where exists (  -- select only affected roll ups
+				select null
+				from MEASUREMENT_PART i
+				where beg_in <= i.seq and i.seq <= end_in
+				and trunc(i.server_time,'MI') = trunc(o.server_time,'MI')
+				and i.measurement_code = o.measurement_code
+				and i.page_name = o.page_name
+				--TODO: add other dims as supported
+			)
+			group by
+				trunc(server_time,'MI') 
+			  , measurement_code
+			  , page_name
+			  , browser
+			  , os
+			  , user_cat1
+			  , user_cat2
+		;
+		
+		-- extend time dimension if necc
+		select max(d_time_id) into max_dt from measurement_facts_stage;
+		if max_dt is null then
+			return;	-- nothing to do
+		end if;
+		extend_time_dim(NULL, next_minute(max_dt) );
+		
+		-- extend code dim
+		insert into d_code (code)
+			select DISTINCT d_code
+			from measurement_facts_stage mfs
+			where not exists (
+				select null
+				from d_code d
+				where d.code = mfs.d_code
+			)
+		;
+
+		-- extend page dim
+		insert into d_page (page_name)
+			select DISTINCT d_page
+			from measurement_facts_stage mfs
+			where not exists (
+				select null
+				from d_page d
+				where d.page_name = mfs.d_page
+			)
+		;
+
+		-- map dim ids
+		update measurement_facts_stage mfs set
+			d_code_id = (select d.code_id from d_code d where d.code = mfs.d_code)
+		  , d_page_id = (select d.page_id from d_page d where d.page_name = mfs.d_page)
+		;
+	
+		-- update facts table
+		-- TODO: figure out if merge is available or update/insert is better than delete/insert
+		delete from measurement_facts mf
+		where exists (
+			select null
+			from measurement_facts_stage mfs
+			where
+				mf.d_time_id = mfs.d_time_id
+			and mf.d_code_id = mfs.d_code_id
+			and mf.d_page_id = mfs.d_page_id
+			and mf.d_browser_id = mfs.d_browser_id
+			and mf.d_os_id = mfs.d_os_id
+			and mf.d_cat1_id = mfs.d_cat1_id
+			and mf.d_cat2_id = mfs.d_cat2_id
+		);
+		insert into measurement_facts (
+			d_time_id
+		  , d_code_id
+		  , d_page_id
+		  , d_browser_id
+		  , d_os_id
+		  , d_cat1_id
+		  , d_cat2_id
+		  , et_count
+		  , et_sum
+		  , et_sum_squares
+		  , et_min
+		  , et_max
+		)
+			select
+				d_time_id
+			  , d_code_id
+			  , d_page_id
+			  , d_browser_id
+			  , d_os_id
+			  , d_cat1_id
+			  , d_cat2_id
+			  , et_count
+			  , et_sum
+			  , et_sum_squares
+			  , et_min
+			  , et_max
+			from measurement_facts_stage
+		;
+	END roll_up_partition;
 
     PROCEDURE roll_up_range(beg_in IN NUMBER, end_in IN NUMBER)
     IS
     BEGIN
-        dbms_output.put_line('beg=' || to_char(beg_in));
+        --dbms_output.put_line('beg=' || to_char(beg_in));
+	    for rec in (
+			select trunc(server_time,'DD') part 
+	        from measurement_view
+			where beg_in <= seq and seq <= end_in
+			group by trunc(server_time,'DD')
+			order by trunc(server_time,'DD')
+		)
+	    loop
+			roll_up_partition(TO_CHAR(rec.part,'YYYYMMDD'), beg_in, end_in);
+	    end loop;
     END roll_up_range;
     
     PROCEDURE roll_up_new
     IS
         last    NUMBER;
-        high     NUMBER;
+        high    NUMBER;
     BEGIN
         select last_seq into last from measurement_last_seq;
         select max(seq) into high from measurement_view where seq >= last;
-        rollup_range(last,high);
+		if high - last > MAX_DETAILS_PER_ROLLUP then
+			high := last + MAX_DETAILS_PER_ROLLUP;
+		end if;
+        roll_up_range(last,high);
         update measurement_last_seq set last_seq = high+1;
         commit;
     END roll_up_new;
