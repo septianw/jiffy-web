@@ -1,6 +1,6 @@
 =Sample Jiffy Log File=
 
-We've included a sample file of real Jiffy data to test the Data_Ingestor (or any similar code you need to write). The sample is [http://code.google.com/p/jiffy-web/source/browse/trunk/ingestor/jiffy.log.example jiffy.log.example] in the ingestor directory.
+We've included a sample file of real Jiffy data to test the Data_Ingestor (or any similar code you need to write). The sample is [http://code.google.com/p/jiffy-web/source/browse/trunk/examples/jiffy.log.example jiffy.log.example] in the ingestor directory.
 
 This is real data from WhitePages.com (with queries with addresses and phone numbers removed). This sample shows three different measurements: page load, page unload, and a single simple Jiffy event, similar to the one in the [http://code.whitepages.com/talks/Velocity%20-%20Introducing%20Jiffy%20-%202008-06-23.pdf sample from the slide deck].
 
@@ -13,4 +13,3 @@ Each row contains
   * URL: note that the ingestor cuts this at 255 characters
   * User Agent
   * Full Domain Name (ignored by the ingestor today)
-
