@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl 
+#!/usr/bin/env perl 
 ##############################################################################
 # jiffy-inserter
 #
@@ -89,10 +89,30 @@ my $VERBOSE = 0; # set to 0 for silent running, 1 will output to STDOUT
 my $DEBUG = 0;
 my $LOG = ""; # source log
 my $MAX_LINES = 100_000; # max logfile lines to process
+my @JIFFY_FIELDS = qw(
+    uuid
+    measurement_code
+    page_name
+    elapsed_time
+    client_ip
+    user_agent
+    browser
+    os
+    server
+    server_time
+    user_cat1
+    user_cat2
+);
+my $SQL_FIELDS = join(',', @JIFFY_FIELDS);
+my $SQL_VALUES = "";
+my $last_table_partition;
+my $last_sth;
 
 # database 
 my $DSN = "DBI:";
 my $CLIENT_DIR;
+my $DBASE;
+my $DBTYPE;
 my $HOST;
 my $USER;
 my $PASS;
@@ -102,7 +122,7 @@ my $PASS;
 ########
 sub main {
     # get runtime options
-    getopts('hVDOMA:m:l:c:H:U:P:W:', \%OPTS);
+    getopts('hVDOMA:m:l:c:H:U:P:W:d:', \%OPTS);
     
     # command line assignments
     $VERBOSE=1  if ($OPTS{V});
@@ -110,6 +130,7 @@ sub main {
     $LOG        = $OPTS{l};
     $MAX_LINES  = $OPTS{m} if ($OPTS{m});
     $HOST       = $OPTS{H};
+	$DBASE		= $OPTS{d};
     $CLIENT_DIR = $OPTS{c};
     $USER       = $OPTS{U};
     $PASS       = $OPTS{P};
@@ -118,8 +139,9 @@ sub main {
     # find a reason to bail
     Usage() if ($OPTS{h}); # -h
     Usage() if ($OPTS{O} && $OPTS{M}); # can't have both 
+	Usage() if (!$OPTS{d}); # must specify the database name
     Usage() if ((!$OPTS{O} && !$OPTS{M}) && !$DEBUG); # can't have neither except in debug mode
-    Usage() if ((!$OPTS{H} || !$OPTS{U}) && !$DEBUG); # need host + user except in debug mode
+    Usage() if (((!$OPTS{H} && !$OPTS{M})|| !$OPTS{U}) && !$DEBUG); # need host + user except in debug mode
     
     # check access log
     die "Can't read $LOG" if (! -r $LOG);
@@ -127,17 +149,30 @@ sub main {
     
     # set up the database
     if ($OPTS{O}) {
+	    $DBTYPE = "ORACLE";
         $DSN .= "Oracle:$HOST";
         $ENV{ORACLE_HOME} = $CLIENT_DIR;
         $ENV{LD_LIBRARY_PATH} = "$CLIENT_DIR/lib";
     }
     elsif ($OPTS{M}) {
-        die "MySQL not supported yet";
+	    $DBTYPE = "MYSQL";
+		$DSN .= "mysql:$DBASE";
+		$ENV{MYSQL_HOME} = $CLIENT_DIR;
+		$ENV{LD_LIBRARY_PATH} = "$CLIENT_DIR/lib";
     }
     else {
         die "Unknown database" if (!$DEBUG);
     }
     
+	if ($DBTYPE eq "ORACLE") {
+		$SQL_VALUES = join(',', 
+	    	map {$_ ne 'server_time' ? "?" : "to_date(?,'yyyy-mm-dd hh24:mi:ss')"} @JIFFY_FIELDS );
+	} elsif ($DBTYPE eq "MYSQL") {
+		$SQL_VALUES = join(',', map {"?"} @JIFFY_FIELDS );
+	} else {
+		die "Unknown database type $DBTYPE"; # this should never happen
+	}
+	
     # open DB handle 
     if (!$DEBUG) {
         #$DBH = DBI->connect($DSN, $USER, $PASS, { AutoCommit => 1, RaiseError => 1, }) 
@@ -221,6 +256,7 @@ sub main {
         
                 # warn or die on DB error
                 # some errors aren't showstoppers, and we should log these but continue
+				# XXX - ORACLE-SPECIFIC ERROR
                 if ($insertResult) {
                     chomp $_;
                     printf BADFILE ("%s ORA-%05d\n", $_, $insertResult); 
@@ -277,6 +313,46 @@ sub main {
         print "$line_count lines read, $insert_count inserts executed.\n"
     }
 } # end main
+
+sub insertRow {
+    my ($entry) = @_;
+    my $sth;
+    my $sqlString;
+
+    $entry->{server} = $SERVER;
+    
+    if ($entry->{table_partition} eq $last_table_partition) {
+        $sth = $last_sth;
+    }
+    else {
+        $sqlString = "INSERT INTO " . $DBASE . ".measurement_$entry->{table_partition} ($SQL_FIELDS) VALUES ($SQL_VALUES)";
+        if ($DEBUG) {
+            $last_sth = $sth = $sqlString;
+        }
+        else {
+            $last_sth = $sth = $DBH->prepare( $sqlString );
+        }
+        $last_table_partition = $entry->{table_partition};
+    }
+
+    if ($DEBUG) {
+        print "Would execute SQL<<$sth>> on \n", Dumper($entry);
+    }
+    else {
+        my $param_i = 1;
+        for my $param (@JIFFY_FIELDS) {
+            $sth->bind_param( $param_i++, $entry->{$param} );
+        }
+        $sth->execute();
+    
+        # errors?
+        if ($sth->err() > 0) {
+            print "BAD INSERT: " . $sth->errstr() . "\n" if ($VERBOSE);
+            return $sth->err();
+        }
+    }
+    return 0;
+}
 
 # take a log entry string and return array of hash-refs, each hash describing a logged measure
 # accomodates old single-entry log format and new bulk log format
@@ -409,66 +485,6 @@ sub getFileInfo {
     return $result;
 } 
 
-my @JIFFY_FIELDS = qw(
-    uuid
-    measurement_code
-    page_name
-    elapsed_time
-    client_ip
-    user_agent
-    browser
-    os
-    server
-    server_time
-    user_cat1
-    user_cat2
-);
-my $SQL_FIELDS = join(',', @JIFFY_FIELDS);
-my $SQL_VALUES = join(',',
-    map {$_ ne 'server_time' ? "?" : "to_date(?,'yyyy-mm-dd hh24:mi:ss')"} @JIFFY_FIELDS );
-my $last_table_partition;
-my $last_sth;
-
-sub insertRow {
-    my ($entry) = @_;
-    my $sth;
-    my $sqlString;
-
-    $entry->{server} = $SERVER;
-    
-    if ($entry->{table_partition} eq $last_table_partition) {
-        $sth = $last_sth;
-    }
-    else {
-        $sqlString = "INSERT INTO jiffy.measurement_$entry->{table_partition} ($SQL_FIELDS) VALUES ($SQL_VALUES)";
-        if ($DEBUG) {
-            $last_sth = $sth = $sqlString;
-        }
-        else {
-            $last_sth = $sth = $DBH->prepare( $sqlString );
-        }
-        $last_table_partition = $entry->{table_partition};
-    }
-
-    if ($DEBUG) {
-        print "Would execute SQL<<$sth>> on \n", Dumper($entry);
-    }
-    else {
-        my $param_i = 1;
-        for my $param (@JIFFY_FIELDS) {
-            $sth->bind_param( $param_i++, $entry->{$param} );
-        }
-        $sth->execute();
-    
-        # errors?
-        if ($sth->err() > 0) {
-            print "BAD INSERT: " . $sth->errstr() . "\n" if ($VERBOSE);
-            return $sth->err();
-        }
-    }
-    return 0;
-}
-
 sub Usage {
     print STDERR <<"EOF";
 
@@ -483,6 +499,7 @@ usage: $0 [-hVD] -l <file> -m <value> -W <value> -O|-M -c <client path> -H <host
  -c <path>	: path to client (ie ORACLE_HOME)
  -A <file>	: file containing database auth (COMING SOON)
  -H		: database host (or tnsname if -O)
+ -d		: database name
  -U		: database user
  -P		: database password
  -W             : time in seconds to silently allow previous job to run
