@@ -1,0 +1,8 @@
+--- 
+loader_password: jiffy_loader
+reader_password: jiffy_reader
+loader_username: jiffy_loader
+username: jiffy
+reader_username: jiffy_reader
+password: jiffy
+database: jiffy
