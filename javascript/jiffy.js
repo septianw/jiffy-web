@@ -110,7 +110,7 @@ var Jiffy = function (){
 			addBulkLoad(_eventName, elapsedTime);
 		}
 		else{
-			var curMeasures = Jiffy.utils.hashToJiffyList({id:_eventName,et:elapsedTime,rt:refStartTime});
+			var curMeasures = Jiffy.utils.hashToJiffyList({_eventName:elapsedTime});
 			Jiffy.Ajax.get('/rx',{uid:uid,st:pageTimer,pn:pname,ets:curMeasures});
 		}
 		checkRemoveEvent(eventName);
