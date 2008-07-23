@@ -35,10 +35,10 @@ var Jiffy = function (){
 	}
 	
   var eventsForRemoval = {};
-  var pageTimer = (window.JiffyParams == undefined) ? (new Date()).getTime():(JiffyParams.jsStart != undefined) ? JiffyParams.jsStart:(new Date()).getTime();
+  var pageTimer = (window.JiffyParams != undefined && JiffyParams.jsStart != undefined) ? JiffyParams.jsStart : (new Date()).getTime();
   
-  var pname = (window.JiffyParams == undefined) ? window.location:(JiffyParams.pname != undefined) ? JiffyParams.pname:window.location;
-  var uid = (window.JiffyParams == undefined) ?  getUID():(JiffyParams.uid != undefined) ? JiffyParams.uid:getUID();
+  var pname = (window.JiffyParams != undefined && JiffyParams.pname != undefined) ? JiffyParams.pname : encodeURI(window.location);
+  var uid = (window.JiffyParams != undefined && JiffyParams.uid != undefined) ? JiffyParams.uid : getUID();
   
   var markers = [];
   var measures = {
@@ -110,7 +110,7 @@ var Jiffy = function (){
 			addBulkLoad(_eventName, elapsedTime);
 		}
 		else{
-			var curMeasures = Jiffy.utils.hashToJiffyList({_eventName:elapsedTime});
+			var curMeasures = Jiffy.utils.formatMeasure(_eventName,elapsedTime);
 			Jiffy.Ajax.get('/rx',{uid:uid,st:pageTimer,pn:pname,ets:curMeasures});
 		}
 		checkRemoveEvent(eventName);
@@ -121,7 +121,7 @@ var Jiffy = function (){
 	  var bulkmeasuresCount = bulkmeasures.length;
 	  var measuresStr = "";
 	  for(x=0;x<bulkmeasuresCount;x++){
-		measuresStr += bulkmeasures[x].evt +":"+ bulkmeasures[x].et+ ",";
+		measuresStr += Jiffy.utils.formatMeasure(bulkmeasures[x].evt,bulkmeasures[x].et) +",";
 	  }
 	  measuresStr = measuresStr.replace(/\,$/g,'');
 	  Jiffy.Ajax.get('/rx',{uid:uid,st:pageTimer,pn:pname,ets:measuresStr});	
@@ -218,12 +218,15 @@ Jiffy.utils = {
 	}
 	return str.replace(/&$/,'');
   },
+  formatMeasure: function(name,val) {
+	return name + ":" + val;
+  },
   hashToJiffyList: function(obj) {
 	var str = '';
 	if ( typeof(obj) == 'object' ) {
 	  for (key in obj) {
 		if(typeof(obj[key]) == 'object'){Jiffy.utils.hashToJiffyList(obj[key]);}
-		else{str += key+':'+obj[key]+',';}
+		else{str += Jiffy.utils.formatMeasure(key,obj[key])+',';}
 	  }
 	}
 	return str.replace(/,$/,'');

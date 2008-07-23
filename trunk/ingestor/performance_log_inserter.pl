@@ -242,7 +242,7 @@ sub main {
                 printf BADFILE ("%s INVALID\n", $_); 
                 next;
             }
-    
+
             for $entry (@$entries) {
                 # look at successes, ignore rest
                 next unless $entry->{status} eq '200';
@@ -396,10 +396,18 @@ sub parseLogEntry {
             $qsh->{ets} :
             join(':', @$qsh{ qw(id et) }); # compose pre-versioned logs into new list format
     my %elapsed_times =
-        map { m/(\w+):(-?\d+)/ }          # break pairs into name and value
+        map { m/(\w+):(.+)/ }             # break pairs into name and value
         split( ',', $elapsed_time_str );  # split Name:et pairs
 
     die("No elapsed times: $entry\n") unless scalar %elapsed_times;
+
+    # fixup log entries made by buggy jiffy.js prior to changeset r105
+    if (3 == scalar(keys %elapsed_times) &&
+        3 == scalar(grep { exists($elapsed_times{$_}) } qw(id et rt))
+       ) { # got three entries with keys id,et,rt
+        # should be one entry with id => et
+        %elapsed_times = ( $elapsed_times{id} => $elapsed_times{et} );
+    }
 
     # force et values into valid ranges
     for my $val (values %elapsed_times) {
@@ -410,6 +418,7 @@ sub parseLogEntry {
     # make array of entries for each elapsed time measure
     my @ret = ();
     for my $measurement_code (keys %elapsed_times) {
+        next unless ($elapsed_times{$measurement_code} =~ /-?\d+/);
         my $entry = { %rec }; # copy master record hash into entry
         $entry->{measurement_code} = $measurement_code;
         $entry->{elapsed_time} = $elapsed_times{$measurement_code};
