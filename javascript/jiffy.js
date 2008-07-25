@@ -40,6 +40,9 @@ var Jiffy = function (){
   var pname = (window.JiffyParams != undefined && JiffyParams.pname != undefined) ? JiffyParams.pname : encodeURI(window.location);
   var uid = (window.JiffyParams != undefined && JiffyParams.uid != undefined) ? JiffyParams.uid : getUID();
   
+  var cUri = '/rx'
+  var cMethod = 'get';
+
   var markers = [];
   var measures = {
 	pn:pname,
@@ -111,7 +114,7 @@ var Jiffy = function (){
 		}
 		else{
 			var curMeasures = Jiffy.utils.formatMeasure(_eventName,elapsedTime);
-			Jiffy.Ajax.get('/rx',{uid:uid,st:pageTimer,pn:pname,ets:curMeasures});
+			Jiffy.Ajax.report(cMethod,cUri,{uid:uid,st:pageTimer,pn:pname,ets:curMeasures});
 		}
 		checkRemoveEvent(eventName);
 	},
@@ -124,7 +127,7 @@ var Jiffy = function (){
 		measuresStr += Jiffy.utils.formatMeasure(bulkmeasures[x].evt,bulkmeasures[x].et) +",";
 	  }
 	  measuresStr = measuresStr.replace(/\,$/g,'');
-	  Jiffy.Ajax.get('/rx',{uid:uid,st:pageTimer,pn:pname,ets:measuresStr});	
+	  Jiffy.Ajax.report(cMethod,cUri,{uid:uid,st:pageTimer,pn:pname,ets:measuresStr});	
 	},
 
 	getMeasures: function(){
@@ -263,33 +266,34 @@ Jiffy.Ajax = {
 	? new XMLHttpRequest() : (window.ActiveXObject) 
 	  ? new ActiveXObject("Microsoft.XMLHTTP") : null);
 	},
-  post: function(url,params,success,failure) {
+  report: function(method, url, params, success, failure) {
 	var req = this.connection();	
-	var strParams = (typeof(params)=='string') ? params : Jiffy.utils.serialize(params);
-	req.onreadystatechange = (!success && !failure)
-	  ? function() { return; }
-	  : function() {
-	  if (this.status == 200) { if (success){success.call(req);} }
-	  else { if(failure){failure.call(req);} }
-	};
-	req.open('POST',url,true);
-	req.send(strParams);
-  },
-  get: function(url,params,success,failure) {
-	var req = this.connection();	
-	var strParams = (typeof(params)=='string') ? params : Jiffy.utils.serialize(params);
+	var strParams = (typeof(params)=='string') ? params : Telemeter.utils.serialize(params);
 	url += '?'+strParams;
 	req.onreadystatechange = (!success && !failure)
 	  ? function() { return; }
 	  : function() {
 	if (req.readyState != 4)
 	  return;
-		
+
 	  if (req.status == 200) { if (success){success.call(req);} }
 	  else { if(failure){failure.call(req);} }
 	};
-	req.open('GET',url,true);
-	req.send(null);
+
+	switch(method) {
+		case 'get':
+			req.open('GET',url,true);
+			req.send(null);
+			break;
+		case 'post':
+			req.open('POST',url,true);
+			req.send(strParams);
+			break;
+		case 'img':
+			var image = document.createElement('img');
+	    	image.setAttribute('src',url);
+			break;
+	}
   }
 };
 
