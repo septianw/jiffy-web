@@ -268,7 +268,7 @@ Jiffy.Ajax = {
 	},
   report: function(method, url, params, success, failure) {
 	var req = this.connection();	
-	var strParams = (typeof(params)=='string') ? params : Telemeter.utils.serialize(params);
+	var strParams = (typeof(params)=='string') ? params : Jiffy.utils.serialize(params);
 	url += '?'+strParams;
 	req.onreadystatechange = (!success && !failure)
 	  ? function() { return; }
